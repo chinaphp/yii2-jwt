@@ -16,12 +16,20 @@ use yii\web\Request as WebRequest;
 trait UserTrait
 {
     /**
+     * Getter for exp that's used for generation of JWT
+     * @return string secret key used to generate JWT
+     */
+    protected static function getJwtExpire(){
+        return Yii::$app->params['JWT_EXPIRE'];
+    }
+
+    /**
      * Getter for secret key that's used for generation of JWT
      * @return string secret key used to generate JWT
      */
     protected static function getSecretKey()
     {
-        return '';
+        return Yii::$app->params['JWT_SECRET'];
     }
 
     /**
