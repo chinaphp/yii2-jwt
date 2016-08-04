@@ -1,3 +1,6 @@
+
+# Fork from https://github.com/damirka/yii2-jwt, and change a lot
+
 # yii2-jwt
 
 JWT implementation for Yii2 Authorization process
