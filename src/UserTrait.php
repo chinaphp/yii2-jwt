@@ -80,18 +80,16 @@ trait UserTrait
      * Override this method in model if you need to complicate id-management
      * @param  integer $id if of user to search
      * @return mixed       User model
-     * @throws \yii\web\ForbiddenHttpException if model is not found
+     * @throws \yii\web\UnauthorizedHttpException if model is not found
      */
-    public static function findByJTI($id)
+    public static function findByUid($id)
     {
         $model = static::findOne($id);
-        $errorText = 'Incorrect token';
-
+        $errorText = "Incorrect token";
         // Throw error if user is missing
         if (empty($model)) {
             throw new UnauthorizedHttpException($errorText);
         }
-
         return $model;
     }
 
@@ -107,43 +105,39 @@ trait UserTrait
 
     /**
      * Returns some 'id' to encode to token. By default is current model id.
-     * If you override this method, be sure that findByJTI is updated too
-     * @return integer any unique integer identifier of user
+     * If you override this method, be sure that getPayloadUid is updated too
+     * @return identifier of user
      */
-    public function getJTI()
+    public function getPayloadUid()
     {
-        return $this->getId();
+        return $this->getPrimaryKey();
     }
 
     /**
-     * Encodes model data to create custom JWT with model.id set in it
+     * @param array $payload
      * @return string encoded JWT
      */
-    public function getJWT()
+    public function getJWT($payload = [])
     {
-        // Collect all the data
-        $secret      = static::getSecretKey();
+        $secret = static::getSecretKey();
         $currentTime = time();
-        $request     = Yii::$app->request;
-        $hostInfo    = '';
+        $request = Yii::$app->request;
+        $hostInfo = '';
 
         // There is also a \yii\console\Request that doesn't have this property
         if ($request instanceof WebRequest) {
             $hostInfo = $request->hostInfo;
         }
+        $payload['iss'] = $hostInfo;
+        $payload['aud'] = $hostInfo;
+        $payload['iat'] = $currentTime;
+        $payload['nbf'] = $currentTime;
 
-        // Merge token with presets not to miss any params in custom
-        // configuration
-        $token = array_merge([
-            'iss' => $hostInfo,
-            'aud' => $hostInfo,
-            'iat' => $currentTime,
-            'nbf' => $currentTime
-        ], static::getHeaderToken());
-
-        // Set up id
-        $token['jti'] = $this->getJTI();
-
-        return JWT::encode($token, $secret, static::getAlgo());
+        // Set up user id
+        $payload['uid'] = $this->getPayloadUid();
+        if (!isset($payload['exp'])) {
+            $payload['exp'] = $currentTime + static::getJwtExpire();
+        }
+        return JWT::encode($payload, $secret, static::getAlgo());
     }
 }
