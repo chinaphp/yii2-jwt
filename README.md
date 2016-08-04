@@ -1,5 +1,5 @@
 
-# Fork from https://github.com/damirka/yii2-jwt, and change a lot
+Fork from https://github.com/damirka/yii2-jwt
 
 # yii2-jwt
 
