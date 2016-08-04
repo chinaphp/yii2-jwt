@@ -8,11 +8,11 @@ For details see [JWT official website](https://jwt.io/introduction/).
 
 To install (only master is available now) run:
 ```
-    composer require "damirka/yii2-jwt:v0.1.0"
+    composer require "msheng/yii2-jwt:1.0.0"
 ```
 Or add this line to *require* section of composer.json:
 ```
-    "damirka/yii2-jwt": "v0.1.0"
+    "msheng/yii2-jwt": "1.0.0"
 ```
 
 ## Usage
@@ -20,15 +20,30 @@ Or add this line to *require* section of composer.json:
 There is only one trait - *UserTrait* - which gives you 5 methods for
 authorization and JWT-management in User model
 
+### project
+
+Your project need to be an [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced) , and here is the [guide](https://github.com/yiisoft/yii2-app-advanced/blob/master/docs/guide/start-installation.md)
+
 Set up:
 
-In controller:
+### In common/config/params.php
+
+```PHP
+<?php
+$params = [
+    'JWT_SECRET' => 'your_secret',
+    'JWT_EXPIRE' => 10*24*60*60
+]
+
+```
+
+### In controller:
 
 ```PHP
 <?php
 
 // ...
-
+use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 
 class BearerAuthController extends \yii\rest\ActiveController
@@ -36,15 +51,16 @@ class BearerAuthController extends \yii\rest\ActiveController
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            'bearerAuth' => [
-                'class' => HttpBearerAuth::className()
+            'authenticator' => [
+                'class' => CompositeAuth::className(),
+                'authMethods' => [HttpBearerAuth::className(),],
             ]
         ]);
     }
 }
 ```
 
-In User model:
+### In User model:
 
 ```PHP
 <?php
@@ -57,20 +73,16 @@ use yii\web\IdentityInterface
 class User extends ActiveRecord implements IdentityInterface
 {
     // Use the trait in your User model
-    use \damirka\JWT\UserTrait;
-
-    // Override this method
-    protected static function getSecretKey()
-    {
-        return 'someSecretKey';
-    }
-
-    // And this one if you wish
-    protected static function getHeaderToken()
-    {
-        return [];
-    }
-
-    // ...
+    use \msheng\JWT\UserTrait;
 }
 ```
+
+### Get the jwt
+
+```PHP
+<?php
+// $user is an User object
+$token = $user->getJwt()
+```
+
+
