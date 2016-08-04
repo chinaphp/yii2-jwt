@@ -21,12 +21,6 @@
     "autoload": {
         "psr-4": {"msheng\\JWT\\": "src/"}
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/damirka/yii2-jwt"
-        }
-    ],
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "firebase/php-jwt": "~4.0.0"
