@@ -19,7 +19,8 @@ trait UserTrait
      * Getter for exp that's used for generation of JWT
      * @return string secret key used to generate JWT
      */
-    protected static function getJwtExpire(){
+    protected static function getJwtExpire()
+    {
         return Yii::$app->params['JWT_EXPIRE'];
     }
 
@@ -33,46 +34,46 @@ trait UserTrait
     }
 
     /**
-     * Getter for "header" array that's used for generation of JWT
-     * @return array JWT Header Token param, see http://jwt.io/ for details
-     */
-    protected static function getHeaderToken()
-    {
-        return [];
-    }
-
-    /**
      * Logins user by given JWT encoded string. If string is correctly decoded
-     * - array (token) must contain 'jti' param - the id of existing user
      * @param  string $accessToken access token to decode
      * @return mixed|null          User model or null if there's no user
-     * @throws \yii\web\ForbiddenHttpException if anything went wrong
+     * @throws \yii\web\UnauthorizedHttpException if anything went wrong
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        $secret = static::getSecretKey();
-        $errorText = 'Incorrect token';
+        $errorText = "Incorrect token";
+        $decodedArray = static::decodeJWT($token);
+        if (!isset($decodedArray['uid'])) {
+            throw new UnauthorizedHttpException($errorText);
+        }
+        // uid is unique identifier of user.
+        $id = $decodedArray['uid'];
+        return static::findByUid($id);
+    }
 
+    /**
+     * Decode JWT token
+     * @param  string $token access token to decode
+     * @return array decoded token
+     */
+    public static function decodeJWT($token)
+    {
+        $secret = static::getSecretKey();
+        $errorText = "Incorrect token";
         // Decode token and transform it into array.
         // Firebase\JWT\JWT throws exception if token can not be decoded
         try {
             $decoded = JWT::decode($token, $secret, [static::getAlgo()]);
         } catch (\Exception $e) {
-            throw new UnauthorizedHttpException($errorText);
+            if(YII_DEBUG){
+                throw new UnauthorizedHttpException($e->getMessage());
+            }
+            else{
+                throw new UnauthorizedHttpException($errorText);
+            }
         }
-
-        $decodedArray = (array) $decoded;
-
-        // If there's no jti param - exception
-        if (!isset($decodedArray['jti'])) {
-            throw new UnauthorizedHttpException($errorText);
-        }
-
-        // JTI is unique identifier of user.
-        // For more details: https://tools.ietf.org/html/rfc7519#section-4.1.7
-        $id = $decodedArray['jti'];
-
-        return static::findByJTI($id);
+        $decodedArray = (array)$decoded;
+        return $decodedArray;
     }
 
     /**
