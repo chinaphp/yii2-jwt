@@ -1,5 +1,5 @@
 {
-    "name": "msheng/yii2-jwt",
+    "name": "chinaphp/yii2-jwt",
     "keywords": ["yii", "jwt"],
     "description": "Trait for easier JWT integration",
     "homepage": "https://github.com/Yemsheng/yii2-jwt",
@@ -16,13 +16,18 @@
             "name": "msheng",
             "email": "msheng.ye@foxmail.com",
             "homepage": "https://github.com/Yemsheng"
+        },
+        {
+            "name": "7Coffee",
+            "email": "chinaphp.com@gmail.com",
+            "homepage": "https://github.com/chinaphp"
         }
     ],
     "autoload": {
-        "psr-4": {"msheng\\JWT\\": "src/"}
+        "psr-4": {"chinaphp\\JWT\\": "src/"}
     },
     "require": {
         "yiisoft/yii2": "~2.0.0",
-        "firebase/php-jwt": "~4.0.0"
+        "firebase/php-jwt": "~6.0.0"
     }
 }

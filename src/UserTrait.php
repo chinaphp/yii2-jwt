@@ -1,6 +1,6 @@
 <?php
 
-namespace msheng\JWT;
+namespace chinaphp\JWT;
 
 use Firebase\JWT\JWT;
 

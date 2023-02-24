@@ -11,11 +11,11 @@ For details see [JWT official website](https://jwt.io/introduction/).
 
 To install (only master is available now) run:
 ```
-    composer require "msheng/yii2-jwt:~1.0.0"
+    composer require "chinaphp/yii2-jwt:~1.0.0"
 ```
 Or add this line to *require* section of composer.json:
 ```
-    "msheng/yii2-jwt": "~1.0.0"
+    "chinaphp/yii2-jwt": "~1.0.0"
 ```
 
 ## Usage
@@ -76,7 +76,7 @@ use yii\web\IdentityInterface
 class User extends ActiveRecord implements IdentityInterface
 {
     // Use the trait in your User model
-    use \msheng\JWT\UserTrait;
+    use \chinaphp\JWT\UserTrait;
 }
 ```
 
